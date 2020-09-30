@@ -44,9 +44,8 @@ Returns a API-key.
 |Authorization|Token {API-Key}|
 
 ### GET /api/task-list/
-Returns a list of task objects.
-
-Can be filtered by **deadline** or/and **status** \\
+Returns a list of task objects.  
+Can be filtered by **deadline** or/and **status**  
 example URL: /api/task-list/?status=New&deadline=2020-09-30
 
 ### POST /api/task-create/
