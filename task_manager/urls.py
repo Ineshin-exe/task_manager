@@ -23,7 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/token/', obtain_auth_token, name='obtain_token'),
-    path('api/auth/', include('rest_auth.urls'), name='login'),
+    path('api/auth/', include('rest_auth.urls')),
     path('api/auth/registration/', include('rest_auth.registration.urls')),
     path('api/', include('api.urls')),
 ]
