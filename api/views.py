@@ -3,8 +3,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .serializers import TaskSerializer
-from .models import Task
+from .serializers import TaskSerializer, ChangeLogTaskSerializer
+from .models import Task, ChangeLogTask
 
 
 @api_view(['GET'])
@@ -50,11 +50,28 @@ def taskItem(request, pk):
 
     if request.method == 'PATCH':
         serializer = TaskSerializer(instance=task, data=request.data)
-        if serializer.is_valid():
-            serializer.save(owner=request.user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if request.data:
+            if serializer.is_valid():
+                serializer.save(owner=request.user)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'message': 'No data to update'}, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         task.delete()
         return Response({'message': 'Task was deleted successfully!'}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def taskChangelog(request, pk):
+    try:
+        task = Task.objects.get(id=pk)
+    except:
+        return Response({'message': 'Task does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    log = ChangeLogTask.objects.filter(task=task)
+    serializer = ChangeLogTaskSerializer(log, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)

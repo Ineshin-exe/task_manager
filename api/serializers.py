@@ -2,7 +2,7 @@ from datetime import date
 
 from rest_framework import serializers
 
-from .models import Task
+from .models import Task, ChangeLogTask
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -15,4 +15,14 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = (
             'owner', 'id', 'title', 'description', 'createdAt',
             'deadline', 'status'
+        )
+
+
+class ChangeLogTaskSerializer(serializers.ModelSerializer):
+    changeTime = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+
+    class Meta:
+        model = ChangeLogTask
+        fields = (
+            '__all__'
         )

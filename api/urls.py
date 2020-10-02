@@ -6,6 +6,7 @@ urlpatterns = [
     path('task-list/', taskList, name='read'),
     path('task-create/', taskCreate, name='create'),
     path('task/<str:pk>/', taskItem, name='item'),
+    path('task/<str:pk>/changelog/', taskChangelog, name='changelog'),
 ]
 
 

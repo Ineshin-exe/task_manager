@@ -9,8 +9,93 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
 
-from api.models import Task
-from api.serializers import TaskSerializer
+from api.models import Task, ChangeLogTask
+from api.serializers import TaskSerializer, ChangeLogTaskSerializer
+
+
+class TaskSerializerTests(APITestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create(username='test',
+                                       password='zxcv1223')
+
+        cls.data = Task.objects.create(owner=User.objects.get(username='test'),
+                                       id=1,
+                                       title='test1',
+                                       description='create',
+                                       createdAt=datetime.utcnow(),
+                                       deadline='2020-10-30',
+                                       status='Planned')
+
+        cls.data = Task.objects.create(owner=User.objects.get(username='test'),
+                                       id=2,
+                                       title='test2',
+                                       description='create',
+                                       createdAt=datetime.utcnow(),
+                                       deadline='2020-10-29',
+                                       status='Planned')
+
+    def test_task_serializer(self):
+
+        expected = [
+        {
+            "owner": "test",
+            "id": 1,
+            "title": "test1",
+            "description": "create",
+            "createdAt": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+            "deadline": "2020-10-30",
+            "status": "Planned"
+        },
+        {
+            "owner": "test",
+            "id": 2,
+            "title": "test2",
+            "description": "create",
+            "createdAt": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+            "deadline": "2020-10-29",
+            "status": "Planned"
+        }]
+
+        serialized = TaskSerializer(Task.objects.all(), many=True).data
+        self.assertEqual(serialized, expected)
+
+
+class ChangeLogTaskSerializerTests(APITestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create(username='test',
+                                       password='zxcv1223')
+
+        cls.data = Task.objects.create(owner=User.objects.get(username='test'),
+                                       id=1,
+                                       title='test1',
+                                       description='create',
+                                       createdAt=datetime.utcnow(),
+                                       deadline='2020-10-30',
+                                       status='Planned')
+
+    def test_changelog_serializer(self):
+
+        expected = [
+            {
+                "id": 1,
+                "changeTime": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+                "data": {
+                    "title": "test1",
+                    "description": "create",
+                    "deadline": "2020-10-30",
+                    "status": "Planned"
+                },
+                "task": 1
+            }
+        ]
+
+        serialized = ChangeLogTaskSerializer(ChangeLogTask.objects.filter(task__id=1), many=True).data
+        print(serialized)
+        self.assertEqual(serialized, expected)
 
 
 class CreateTaskTests(APITestCase):
@@ -247,11 +332,11 @@ class OneTaskTests(APITestCase):
     def test_nothing_update_task(self):
         url = reverse('item', args=('1'))
 
-        expected = TaskSerializer(Task.objects.filter(id=1).first()).data
+        expected = {'message': 'No data to update'}
 
         response = self.client.patch(url, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(json.loads(response.content), expected)
 
     def test_title_update_task(self):
@@ -267,7 +352,8 @@ class OneTaskTests(APITestCase):
 
         expected = TaskSerializer(task).data
 
-        response = self.client.patch(url, data, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
+        response_update = self.client.patch(url, data, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
+        response = self.client.get(url, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json.loads(response.content), expected)
@@ -300,12 +386,14 @@ class OneTaskTests(APITestCase):
         self.assertEqual(json.loads(response.content), expected)
 
 
-class TaskSerializerTests(APITestCase):
+class ChangeLogTaskTests(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create(username='test',
                                        password='zxcv1223')
+        cls.key = Token.objects.create(user=User.objects.get(username='test'))
+        cls.token = cls.key.key
 
         cls.data = Task.objects.create(owner=User.objects.get(username='test'),
                                        id=1,
@@ -323,28 +411,30 @@ class TaskSerializerTests(APITestCase):
                                        deadline='2020-10-29',
                                        status='Planned')
 
-    def test_task_serializer(self):
+    def test_check_changelog_task(self):
+        url_task = reverse('item', args=('1'))
+        url_changelog = reverse('changelog', args=('1'))
 
-        expected = [
-        {
-            "owner": "test",
-            "id": 1,
-            "title": "test1",
-            "description": "create",
-            "createdAt": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
-            "deadline": "2020-10-30",
-            "status": "Planned"
-        },
-        {
-            "owner": "test",
-            "id": 2,
-            "title": "test2",
-            "description": "create",
-            "createdAt": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
-            "deadline": "2020-10-29",
-            "status": "Planned"
-        }]
+        data = {
+            "title": "updated"
+        }
 
-        serialized = TaskSerializer(Task.objects.all(), many=True).data
+        task = Task.objects.filter(id=1).first()
+        task.title = 'updated'
+        task.save()
 
-        self.assertEqual(serialized, expected)
+        expected_task = TaskSerializer(task).data
+
+        response_update = self.client.patch(url_task, data, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
+        response_task = self.client.get(url_task, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
+        response_changelog = self.client.get(url_changelog, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
+
+        expected_log = ChangeLogTaskSerializer(ChangeLogTask.objects.filter(task=task), many=True).data
+
+        self.assertEqual(response_update.status_code, status.HTTP_200_OK)
+        self.assertEqual(response_task.status_code, status.HTTP_200_OK)
+        self.assertEqual(response_changelog.status_code, status.HTTP_200_OK)
+        self.assertEqual(json.loads(response_update.content), expected_task)
+        self.assertEqual(json.loads(response_task.content), expected_task)
+        self.assertEqual(json.loads(response_changelog.content), expected_log)
+
