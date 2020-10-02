@@ -1,9 +1,8 @@
 # task_manager
 
 
-# API Guide
-
-## Authentication
+## API Guide
+### 1. Authentication:
 
 ### POST /api/auth/registration/
 Register new user in database. Returns a API-key.
@@ -24,9 +23,9 @@ Returns a API-key.
 |nickname|string  |Nickname of user|
 |password|string  |Password of user|
 
-###
 
-## Task object
+
+### 2. Task object:
 #### Task structure
 |Field|Type|Description|
 |------|-----------------|---------|
@@ -59,3 +58,23 @@ Modify a task object. Returns a modified task object on success.
 
 ### DELETE /api/task/{id}/
 Delete a task object. Returns message on success.
+
+### 3. Changelog object
+#### Changelog structure
+|Field|Type|Description|
+|------|-----------------|---------|
+|id        |integer|Id of changelog.|
+|changeTime|string |Time of changelog of task.|
+|data      |string |Last revision of parent task. Data in JSON format.|
+|task      |integer|Id of parent task.|
+
+#### Field "data" structure
+|Field|Type|Description|
+|-----------|--------|---------|
+|title      |string  |Title of task. Max_length = 64|
+|description|string  |Description of task.|
+|deadline   |string  |Date field, format: DD-MM-YYYY|
+|status     |string  |One of status: **New**, **Planned**, **In progress**, **Completed**|
+
+### GET /api/task/{id}/changelog/
+Returns a changelog object by task id.
