@@ -81,7 +81,7 @@ class ChangeLogTaskSerializerTests(APITestCase):
 
         expected = [
             {
-                "id": 1,
+                "task": 1,
                 "changeTime": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
                 "data": {
                     "title": "test1",
@@ -89,7 +89,6 @@ class ChangeLogTaskSerializerTests(APITestCase):
                     "deadline": "2020-10-30",
                     "status": "Planned"
                 },
-                "task": 1
             }
         ]
 
