@@ -24,5 +24,5 @@ class ChangeLogTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChangeLogTask
         fields = (
-            '__all__'
+            'task', 'changeTime', 'data'
         )
