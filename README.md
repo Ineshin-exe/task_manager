@@ -5,23 +5,23 @@
 ### 1. Authentication:
 
 ### POST /api/auth/registration/
-Register new user in database. Returns a API-key.
+Register new user in database. Returns an API-key.
 
 #### JSON params
 |Field|Type|Description|
 |---------|--------|----------------|
-|nickname |string  |Nickname of user|
-|password1|string  |Password of user|
-|password2|string  |Retype password |
+|nickname |string  |User's nickname|
+|password1|string  |User's password|
+|password2|string  |Password repeat|
 
 ### POST /api/auth/login/
-Returns a API-key.
+Returns an API-key.
 
 #### JSON params
 |Field|Type|Description|
 |--------|--------|----------------|
-|nickname|string  |Nickname of user|
-|password|string  |Password of user|
+|nickname|string  |User's nickname|
+|password|string  |User's password|
 
 
 
@@ -30,14 +30,14 @@ Returns a API-key.
 |Field|Type|Description|
 |------|-----------------|---------|
 |owner      |user    |User object. (Read-only)|
-|id         |integer |Id of task. (Read-only)|
-|title      |string  |Title of task. Max_length = 64|
-|description|string  |Description of task.|
+|id         |integer |Id of the task. (Read-only)|
+|title      |string  |Task's title. Max_length = 64.|
+|description|string  |Task's description.|
 |createdAt  |string  |Date-Time field, format: DD-MM-YYYY HH-MM-SS|
 |deadline   |string  |Date field, format: DD-MM-YYYY|
 |status     |string  |One of status: **New**, **Planned**, **In progress**, **Completed**|
 
-#### Requires authentication with API-key.
+#### Authentication requires with API-key.
 |Key|Value|
 |--------|--------|
 |Authorization|Token {API-Key}|
@@ -64,15 +64,15 @@ Delete a task object. Returns message on success.
 |Field|Type|Description|
 |------|-----------------|---------|
 |id        |integer|Id of changelog.|
-|changeTime|string |Time of changelog of task.|
+|changeTime|string |Time of task's changelog.|
 |data      |string |Last revision of parent task. Data in JSON format.|
 |task      |integer|Id of parent task.|
 
 #### Field "data" structure
 |Field|Type|Description|
 |-----------|--------|---------|
-|title      |string  |Title of task. Max_length = 64|
-|description|string  |Description of task.|
+|title      |string  |Task's title. Max_length = 64|
+|description|string  |Task's description.|
 |deadline   |string  |Date field, format: DD-MM-YYYY|
 |status     |string  |One of status: **New**, **Planned**, **In progress**, **Completed**|
 

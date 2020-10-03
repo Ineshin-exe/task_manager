@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=task_manager
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+    ports:
+      - "5432:5432"
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+    - .:/code
+    ports:
+    - "8000:8000"
+    env_file:
+    - ./task_manager/.env
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

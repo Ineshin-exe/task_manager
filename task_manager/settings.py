@@ -12,26 +12,31 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 import os
 import psycopg2.extensions
+import environ
 
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
+env = environ.Env(
+    DEBUG=(bool, False),
+)
+
+environ.Env.read_env()
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '4&a7s_7ih8q3o!^hj4%o#_h36$(sb7g^&h&eu82*#f3w18ptps'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = [
-    "127.0.0.1"
-]
+ALLOWED_HOSTS = env('ALLOWED_HOSTS').split(", ")
 
+# SECURITY WARNING: don't run with debug turned on in production!
 
 # Application definition
 
@@ -83,21 +88,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'task_manager.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'task_manager',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
+    'default': env.db()
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -117,13 +113,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = env('LANGUAGE_CODE')
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = env('TIME_ZONE')
 
 USE_I18N = True
 
@@ -131,14 +126,12 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
 
-
-#REST_Framework
+# REST_Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
