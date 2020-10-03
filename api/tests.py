@@ -334,7 +334,7 @@ class OneTaskTests(APITestCase):
 
         expected = {'message': 'No data to update'}
 
-        response = self.client.patch(url, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
+        response = self.client.put(url, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(json.loads(response.content), expected)
@@ -352,7 +352,7 @@ class OneTaskTests(APITestCase):
 
         expected = TaskSerializer(task).data
 
-        response_update = self.client.patch(url, data, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
+        response_update = self.client.put(url, data, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
         response = self.client.get(url, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -425,7 +425,7 @@ class ChangeLogTaskTests(APITestCase):
 
         expected_task = TaskSerializer(task).data
 
-        response_update = self.client.patch(url_task, data, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
+        response_update = self.client.put(url_task, data, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
         response_task = self.client.get(url_task, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
         response_changelog = self.client.get(url_changelog, format='json', HTTP_AUTHORIZATION='Token {}'.format(self.token))
 

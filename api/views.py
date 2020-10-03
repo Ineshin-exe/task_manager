@@ -36,7 +36,7 @@ def taskCreate(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'PATCH', 'DELETE'])
+@api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def taskItem(request, pk):
     try:
@@ -48,7 +48,7 @@ def taskItem(request, pk):
         serializer = TaskSerializer(task)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    if request.method == 'PATCH':
+    if request.method == 'PUT':
         serializer = TaskSerializer(instance=task, data=request.data)
         if request.data:
             if serializer.is_valid():
