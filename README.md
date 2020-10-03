@@ -1,5 +1,26 @@
 # task_manager
 
+Basic Backend-API for task manager.
+
+## Installation Guide
+1\. Clone the repo:
+> $ git clone https://github.com/Ineshin-exe/task_manager.git
+
+2\. Set your parameters in follow files:
+- "docker-compose.yml"
+- "./task_manager/.env"
+
+3\. Build and up with docker-compose:
+> $ docker-compose up -d --build
+
+4\. Database's migrations:
+> $ docker-compose exec web python manage.py makemigrations
+> $ docker-compose exec web python manage.py migrate
+
+5 (Optional). Run tests:
+> $ docker-compose exec web python manage.py test
+
+
 
 ## API Guide
 ### 1. Authentication:
