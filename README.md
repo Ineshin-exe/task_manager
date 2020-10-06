@@ -14,7 +14,8 @@ Basic Backend-API for task manager.
 > $ docker-compose up -d --build
 
 4\. Database's migrations:
-> $ docker-compose exec web python manage.py makemigrations
+> $ docker-compose exec web python manage.py makemigrations 
+
 > $ docker-compose exec web python manage.py migrate
 
 5 (Optional). Run tests:
