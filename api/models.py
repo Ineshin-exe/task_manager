@@ -2,14 +2,15 @@ import json
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Task(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
     id = models.AutoField(primary_key=True, unique=True)
     title = models.CharField(default='Undefined', max_length=64)
     description = models.TextField(default='No description.')
-    createdAt = models.DateTimeField(null=True, auto_now_add=True)
+    created_at = models.DateTimeField(null=False, default=timezone.now)
     deadline = models.DateField(null=True)
 
     class Status(models.TextChoices):
@@ -40,8 +41,8 @@ class Task(models.Model):
 class ChangeLogTask(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     id = models.AutoField(primary_key=True, unique=True)
-    changeTime = models.DateTimeField(null=True, auto_now_add=True)
+    change_time = models.DateTimeField(null=True, auto_now_add=True)
     data = models.JSONField(null=True)
 
     def __str__(self):
-        return '{}[{}] at {}'.format(self.task.title, self.task.id, self.changeTime.strftime('%Y-%m-%d %H:%M:%S'))
+        return '{}[{}] at {}'.format(self.task.title, self.task.id, self.change_time.strftime('%Y-%m-%d %H:%M:%S'))

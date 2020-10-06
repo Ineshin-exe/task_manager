@@ -9,7 +9,7 @@ from .models import Task, ChangeLogTask
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def taskList(request):
+def task_list(request):
     list = Task.objects.filter(owner=request.user)
     params = request.query_params
 
@@ -27,22 +27,26 @@ def taskList(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def taskCreate(request):
+def task_create(request):
 
     serializer = TaskSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save(owner=request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    serializer.save(owner=request.user)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def taskItem(request, pk):
+def task_item(request, pk):
     try:
         task = Task.objects.get(id=pk)
     except:
         return Response({'message': 'Task does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if not task.owner == request.user:
+        return Response({'message': 'You are not a owner of this task.'}, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'GET':
         serializer = TaskSerializer(task)
@@ -50,22 +54,25 @@ def taskItem(request, pk):
 
     if request.method == 'PUT':
         serializer = TaskSerializer(instance=task, data=request.data)
-        if request.data:
-            if serializer.is_valid():
-                serializer.save(owner=request.user)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
+
+        if not request.data:
             return Response({'message': 'No data to update'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save(owner=request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'DELETE':
         task.delete()
         return Response({'message': 'Task was deleted successfully!'}, status=status.HTTP_200_OK)
 
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def taskChangelog(request, pk):
+def task_changelog(request, pk):
     try:
         task = Task.objects.get(id=pk)
     except:
