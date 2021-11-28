@@ -7,11 +7,10 @@ from django.utils import timezone
 
 class Task(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
-    id = models.AutoField(primary_key=True, unique=True)
     title = models.CharField(default='Undefined', max_length=64)
     description = models.TextField(default='No description.')
     created_at = models.DateTimeField(null=False, default=timezone.now)
-    deadline = models.DateField(null=True)
+    deadline = models.DateField()
 
     class Status(models.TextChoices):
         NEW = 'New'
@@ -40,8 +39,7 @@ class Task(models.Model):
 
 class ChangeLogTask(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    id = models.AutoField(primary_key=True, unique=True)
-    change_time = models.DateTimeField(null=True, auto_now_add=True)
+    change_time = models.DateTimeField(auto_now_add=True)
     data = models.JSONField(null=True)
 
     def __str__(self):

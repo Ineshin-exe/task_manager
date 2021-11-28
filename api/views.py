@@ -19,7 +19,8 @@ def task_list(request):
         elif filter == 'deadline':
             list = list.filter(deadline=params[filter])
         else:
-            return Response({'message': 'filter \'{}\' is not supported'.format(filter)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'filter \'{}\' is not supported'.format(filter)},
+                            status=status.HTTP_400_BAD_REQUEST)
 
     serializer = TaskSerializer(list, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -36,6 +37,7 @@ def task_create(request):
 
     serializer.save(owner=request.user)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
@@ -67,7 +69,6 @@ def task_item(request, pk):
     elif request.method == 'DELETE':
         task.delete()
         return Response({'message': 'Task was deleted successfully!'}, status=status.HTTP_200_OK)
-
 
 
 @api_view(['GET'])
